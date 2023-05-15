@@ -1,5 +1,6 @@
 import argparse
 import cv2
+import datetime
 
 from yolo import YOLO
 
@@ -37,11 +38,23 @@ if vc.isOpened():  # try to get the first frame
 else:
     rval = False
 
+
+def logging(label):
+    now = datetime.datetime.now()
+
+    with open('logging.txt', 'a') as file:
+        file.write(str(now) + f' - {label}\n')
+    print(label)
+
+
+records = []
+count_close = 0
+count_far = 0
 while rval:
     width, height, inference_time, results = yolo.inference(frame)
 
     # display fps
-    cv2.putText(frame, f'{round(1/inference_time,2)} FPS', (15,15), cv2.FONT_HERSHEY_SIMPLEX,0.5, (0,255,255), 2)
+    cv2.putText(frame, f'{round(1 / inference_time, 2)} FPS', (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
 
     # sort by confidence
     results.sort(key=lambda x: x[2])
@@ -56,6 +69,23 @@ while rval:
         id, name, confidence, x, y, w, h = detection
         cx = x + (w / 2)
         cy = y + (h / 2)
+        records.append(w * h)
+        if len(records) != 1:
+            if records[-1] > records[-2]:
+                count_close += 1
+                if count_far > 0:
+                    count_far -= 1
+            else:
+                count_far += 1
+                if count_close > 0:
+                    count_close -= 1
+
+        if count_close == 5:
+            logging('Approach')
+            count_close = 0
+        if count_far == 5:
+            logging('Away')
+            count_far = 0
 
         # draw a bounding box rectangle and label on the image
         color = (0, 255, 255)
