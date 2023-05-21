@@ -1,4 +1,6 @@
 .idea
 venv
 *.pyc
+models/*.cfg
+models/*.weights
 logging.txt

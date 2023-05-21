@@ -63,11 +63,19 @@ The model itself is fully compatible with the opencv dnn module and just ready t
 - Finally, the timestamp and trend of the moment are saved into the logging file
 
 ### Run 
+Install numpy and opencv-python
 ```bash
-# install numpy and opencv-python
 pip3 install -r requirement
 ```
 
+Download the configuration and weight of the models
+```bash
+# mac / linux
+cd models && sh ./download-models.sh
+
+# windows
+cd models && .\download-models.ps1
+```
 
 Then run the following command to start a webcam detector with YOLOv3:
 
